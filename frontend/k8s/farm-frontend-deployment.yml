@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: farm-frontend-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: farm-frontend
+    spec:
+      containers:
+        - name: farm-frontend
+          image: sajjadhz/farm-frontend:v1
+          ports:
+            - containerPort: 80
+              name: http-port
+          env:
+            - name: API_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: API_HOST
+                  name: farm-stack-configmap
+                  optional: false
+            - name: API_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: API_PORT
+                  name: farm-stack-configmap
+                  optional: false
+            - name: CLOUDL_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  key: CLOUDL_SERVER
+                  name: farm-stack-configmap
+                  optional: false
+  selector:
+    matchLabels:
+      app: farm-frontend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: farm-frontend-service
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: http-port
+      nodePort: 30009
+  selector:
+    app: farm-frontend
+  type: NodePort

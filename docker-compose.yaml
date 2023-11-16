@@ -1,14 +1,14 @@
 version: '3.1'
 
 services:
-  mongo:
+  mongodb-service:
     image: mongo
     restart: always
     ports:
       - 27017:27017
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
     env_file:
       - .env
     networks:
@@ -17,40 +17,40 @@ services:
       - ./data/mongo:/data/db
       - ./data/mongo-init:/docker-entrypoint-initdb.d
 
-  mongo-express:
+  mongo-express-service:
     image: mongo-express
     restart: always
     ports:
       - 8081:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/?authSource=admin
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb-service:27017/Todo?authSource=admin
     env_file:
       - .env
     networks:
       backend: null
-  farm-backend:
+  farm-backend-service:
     build: ./backend
     ports:
       - "8080:8080"
     env_file:
       - .env
     depends_on:  
-      - mongo    
+      - mongodb-service    
     networks:
       backend: null
     restart: always
     volumes:
       - './backend:/code'
-  farm-frontend:
+  farm-frontend-service:
     build: ./frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
     env_file:
       - .env
     depends_on:  
-      - farm-backend    
+      - farm-backend-service    
     networks:
       backend: null
     restart: always

@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: farm-backend-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: farm-backend
+    spec:
+      containers:
+        - name: farm-backend
+          image: sajjadhz/farm-backend:v1
+          ports:
+            - containerPort: 5000
+              name: nodejs-port
+          env:
+            - name: ME_CONFIG_MONGODB_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: ME_CONFIG_MONGODB_URL
+                  name: farm-stack-configmap
+                  optional: false
+            - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: mongo-root-username
+                  name: farm-stack-secret
+                  optional: false
+            - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: mongo-root-password
+                  name: farm-stack-secret
+                  optional: false
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_URL
+                  name: farm-stack-configmap
+                  optional: false
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: DB_NAME
+                  name: farm-stack-configmap
+                  optional: false
+            - name: DEBUG_MODE
+              valueFrom:
+                configMapKeyRef:
+                  key: DEBUG_MODE
+                  name: farm-stack-configmap
+                  optional: false 
+  selector:
+    matchLabels:
+      app: farm-backend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: farm-backend-service
+spec:
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: farm-backend

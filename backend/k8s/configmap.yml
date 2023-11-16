@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: farm-stack-configmap
+data:
+  API_HOST: farm-backend-service
+  API_PORT: '8080'
+  CLOUDL_SERVER: farm-backend-service
+  DB_NAME: Todo
+  DB_URL: mongodb://admin:password@mongodb-service:27017/Todo?authSource=admin
+  DEBUG_MODE: 'True'
+  ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb-service:27017/Todo?authSource=admin
+  db_service: mongodb-service
